@@ -3,6 +3,7 @@
 #include <curl/curl.h>
 #include "WeatherClient.h"
 #include "json.hpp"
+#include "Conditions.h"
 //compile command
 // g++ -std=c++17 -Wall -Wextra -pedantic -O2 -o app main.cpp WeatherClient.cpp -lcurl
 
@@ -40,6 +41,13 @@ int main(int argc, char* argv[])
         return out;
     };
 
+    //function to get correct start time
+    auto pad2 = [](int h) {
+        string s = to_string(h);
+        if (s.size() == 1) s= "0"+s;
+        return s;
+    };
+
     //make url to get lat and long
     const string encoded_location = encode_for_query(location);
     const string geo_url = "https://geocoding-api.open-meteo.com/v1/search?name="
@@ -65,6 +73,8 @@ int main(int argc, char* argv[])
     cout << "Lat: " << lat << "\n";
     cout << "Lon: " << lon << "\n";
 
+    //Current Conditions
+    Conditions current;
     //forecast api call
     const string current_forecast_url =
         "https://api.open-meteo.com/v1/forecast?latitude=" + std::to_string(lat) +
