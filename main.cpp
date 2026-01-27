@@ -5,7 +5,8 @@
 #include "json.hpp"
 #include "Conditions.h"
 //compile command
-// g++ -std=c++17 -Wall -Wextra -pedantic -O2 -o app main.cpp WeatherClient.cpp -lcurl
+// g++ -std=c++17 -Wall -Wextra -pedantic -O2 \
+-o app main.cpp WeatherClient.cpp Conditions.cpp -lcurl
 
 
 int main(int argc, char* argv[])
@@ -103,6 +104,7 @@ int main(int argc, char* argv[])
 
     // Current Conditions
     Conditions Curr;
+    Curr.label = "Current Conditions of location";
     const json& current_conditions = j_forecast["current"];
     Curr.weather_code = current_conditions.at("weather_code").get<int>();
     Curr.temp_f = current_conditions.at("temperature_2m").get<double>();
@@ -110,7 +112,7 @@ int main(int argc, char* argv[])
     Curr.wind_speed_mph = current_conditions.at("wind_speed_10m").get<double>();
     Curr.precipitation_in = current_conditions.at("precipitation").get<double>();
     Curr.wind_gusts_mph = current_conditions.at("wind_gusts_10m").get<double>();
-    Curr.time = current_conditions.at("time").get<std::string>().substr(12,16);
+    Curr.time = current_conditions.at("time").get<std::string>();
     Curr.print();
 
     //Build timestamp for start time
@@ -135,17 +137,19 @@ int main(int argc, char* argv[])
     
     if (start_idx == -1) {
         std::cerr << "Could not find start time in hourly forecast";
+        return 1;
     } 
 
     //Start time conditons
     Conditions Start;
     Start.label = "Starting Time of the hike";
-    Start.time = start_target_time.substr(12,16);
+    Start.time = times[start_idx];
     Start.weather_code = hourly.at("weather_code")[start_idx].get<int>();
-
-
-
-
-
+    Start.temp_f = hourly.at("temperature_2m")[start_idx].get<double>();
+    Start.apparent_temp_f = hourly.at("apparent_temperature")[start_idx].get<double>();
+    Start.wind_speed_mph = hourly.at("wind_speed_10m")[start_idx].get<double>();
+    Start.wind_gusts_mph = hourly.at("wind_gusts_10m")[start_idx].get<double>();
+    Start.precipitation_in = hourly.at("precipitation")[start_idx].get<double>();
+    Start.print();
 
 }
