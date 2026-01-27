@@ -74,39 +74,48 @@ int main(int argc, char* argv[])
     cout << "Lon: " << lon << "\n";
 
     //Current Conditions
-    Conditions current;
+    Conditions Curr;
     //forecast api call
-    const string current_forecast_url =
+    const string forecast_url =
         "https://api.open-meteo.com/v1/forecast?latitude=" + std::to_string(lat) +
         "&longitude=" + std::to_string(lon) +
         "&current=temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m"
         "&temperature_unit=fahrenheit"
         "&wind_speed_unit=mph"
         "&precipitation_unit=inch"
-        "&timezone=auto";
+        "&timezone=auto"
+        "&hourly=temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m"
+        "&forecast_hour=48";
 
-    const string current_forecast_body = client.get(current_forecast_url); //raw json text
-    json current_j_forecast = json::parse(current_forecast_body);
+    // std::cout << "\n=== Forecast API URL ===\n";
+    // std::cout << forecast_url << "\n\n";
 
-    if (!current_j_forecast.contains("current") || current_j_forecast["current"].empty()) {
+    const string forecast_body = client.get(forecast_url); //raw json text
+    // std::cout << "=== Raw Forecast API Response ===\n";
+    // std::cout << forecast_body << "\n";
+
+    json j_forecast = json::parse(forecast_body);
+
+    if (!j_forecast.contains("current") || j_forecast["current"].empty()) {
         cerr << "No Weather results for: " << location << "\n";
         return 1;
     }
 
-    const json& current_conditions = current_j_forecast["current"];
-    int c_weather_code = current_conditions.at("weather_code").get<int>();
-    double c_temp = current_conditions.at("temperature_2m").get<double>();
-    double c_apparent_temp = current_conditions.at("apparent_temperature").get<double>();
-    double c_wind_speed = current_conditions.at("wind_speed_10m").get<double>();
-    double c_precipitation = current_conditions.at("precipitation").get<double>();
-    string curr_time = current_conditions.at("time").get<string>();
+    const json& current_conditions = j_forecast["current"];
+    Curr.weather_code = current_conditions.at("weather_code").get<int>();
+    Curr.temp_f = current_conditions.at("temperature_2m").get<double>();
+    Curr.apparent_temp_f = current_conditions.at("apparent_temperature").get<double>();
+    Curr.wind_speed_mph = current_conditions.at("wind_speed_10m").get<double>();
+    Curr.precipitation_in = current_conditions.at("precipitation").get<double>();
+    Curr.wind_gusts_mph = current_conditions.at("wind_gusts_10m").get<double>();
+    Curr.time = current_conditions.at("time").get<string>();
 
-    cout << "Weather Code: " << c_weather_code << "\n";
-    cout << "Current temp: " << c_temp << "\n";
-    cout << "Apparent temp: " << c_apparent_temp << "\n";
-    cout << "Wind Speed: " << c_wind_speed << "\n";
-    cout << "Precipation: " << c_precipitation << "\n";
-    cout << "Current time: " << curr_time << "\n";
+    // cout << "Weather Code: " << c_weather_code << "\n";
+    // cout << "Current temp: " << c_temp << "\n";
+    // cout << "Apparent temp: " << c_apparent_temp << "\n";
+    // cout << "Wind Speed: " << c_wind_speed << "\n";
+    // cout << "Precipation: " << c_precipitation << "\n";
+    // cout << "Current time: " << curr_time << "\n";
 
 
 }

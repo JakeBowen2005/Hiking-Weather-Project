@@ -9,6 +9,7 @@ public:
     double temp_f = 0;
     double apparent_temp_f = 0;
     double wind_speed_mph = 0;
+    double wind_gusts_mph = 0;
     double precipitation_in = 0;
     void print() const;
 
