@@ -3,6 +3,7 @@
 
 void Conditions::print() const {
     std::cout << "\n== " << label << " ==\n";
+    std::cout << "Date: " << time.substr(0,10) << "\n";
     std::cout << "Time: " << time.substr(11,5) << "\n";
     std::cout << "Weather code: " << weather_code << "\n";
     std::cout << "Temp: " << temp_f << " F (feels like " << apparent_temp_f << " F)\n";

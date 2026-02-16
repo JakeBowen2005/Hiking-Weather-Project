@@ -152,61 +152,22 @@ int main(int argc, char* argv[])
     Start.precipitation_in = hourly.at("precipitation")[start_idx].get<double>();
     Start.print();
 
-    //End time conditions
+    // End time conditions (simple index math)
+    int end_idx = start_idx + duration;
 
-    //fuctions to get correct end time and date
-     
-    //leap year function
-    auto leap_year = [](int y) {
-        return ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0));
-    };
+    if (end_idx >= static_cast<int>(times.size())) {
+        std::cerr << "Hike extends beyond available forecast data.\n";
+        return 1;
+    }
 
-    
-    auto days_in_month = [&](int year, int month) {
-        switch (month) {
-            case 1: return 31;
-            case 2: return leap_year(year) ? 29 : 28;
-            case 3: return 31;
-            case 4: return 30;
-            case 5: return 31;
-            case 6: return 30;
-            case 7: return 31;
-            case 8: return 31;
-            case 9: return 30;
-            case 10: return 31;
-            case 11: return 30;
-            case 12: return 31;
-            default: return 30;
-        }
-    };
-
-    auto add_days_y_m_d = [&](const std::string& date, int add_days) {
-        int year = std::stoi(date.substr(0,4));
-        int month = std::stoi(date.substr(5,2));
-        int day = std::stoi(date.substr(8,2));
-
-        while (add_days > 0) {
-            int dim = days_in_month(year, month);
-            if (day < dim) {
-                day++;
-            } else {
-                day = 1;
-                if (month < 12) {
-                    month++;
-                } else {
-                    month = 1;
-                    year++;
-                }
-            }
-            --add_days;
-        }
-
-        auto pad2int = [] (int v) {
-            std::string s = std::to_string(v);
-            if (s.size() == 1) s = "0" + s;
-            return s;
-        };
-
-        return std::to_string(year) + "-" + pad2int(month) + pad2int(day);
-    };
+    Conditions End;
+    End.label = "End Time of the hike";
+    End.time = times[end_idx].get<std::string>();
+    End.weather_code = hourly.at("weather_code")[end_idx].get<int>();
+    End.temp_f = hourly.at("temperature_2m")[end_idx].get<double>();
+    End.apparent_temp_f = hourly.at("apparent_temperature")[end_idx].get<double>();
+    End.wind_speed_mph = hourly.at("wind_speed_10m")[end_idx].get<double>();
+    End.wind_gusts_mph = hourly.at("wind_gusts_10m")[end_idx].get<double>();
+    End.precipitation_in = hourly.at("precipitation")[end_idx].get<double>();
+    End.print();
 }
